@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>oreum</title>
+<meta name="description" content="오름 — 홈에서 미션 인증, 포인트 적립, 연속활동 갱신까지 이어지는 프로토타입">
+<meta name="theme-color" content="#ffffff">
+<!-- iOS 홈 화면 앱 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="oreum">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="fonts/Pretendard-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app" aria-live="polite">
+
+  <!-- ───────── 0. 공통: 가짜 상태바 (데스크톱 미리보기에서만 보임) ───────── -->
+  <template id="tpl-statusbar">
+    <div class="statusbar">
+      <span class="sb-time">9:41</span>
+      <span class="sb-levels"><img class="sb-cell" alt=""><img class="sb-wifi" alt=""><img class="sb-batt" alt=""></span>
+    </div>
+  </template>
+
+  <!-- ───────── 1. 홈 (홈_메인_집 1242:3831 / 바텀시트 1857:6361) ───────── -->
+  <section class="screen light" id="home" data-sb="dark">
+    <div class="home-bg"><img src="assets/home/bg.jpg" alt=""></div>
+
+    <div class="home-nav">
+      <button class="logo" id="logo" aria-label="oreum (길게 누르면 처음 상태로)">oreum</button>
+      <button class="hanger" data-toast="꾸미기는 이 프로토타입에 포함되지 않았어요" aria-label="꾸미기"><img src="assets/home/hanger.svg" alt=""></button>
+    </div>
+
+    <div class="greeting">준호님 오늘도<br>한 걸음 올라가볼까요?</div>
+
+    <div class="char-shadow"><img src="assets/home/shadow.svg" alt=""></div>
+    <img class="char" src="assets/home/char.png" alt="오르미">
+
+    <button class="streak-chip" id="homeChip" data-go="activity">
+      <span class="sym"><img src="assets/home/symbol.svg" alt=""></span>
+      <span class="chip-txt"><b id="homeChipNum">2</b>일 째 오름</span>
+    </button>
+    <div class="home-bar"><div class="home-bar-fill" id="homeBarFill"></div></div>
+    <div class="peek"><img src="assets/home/peek.png" alt=""></div>
+
+    <div class="dim" id="sheetDim"></div>
+
+    <div class="sheet" id="sheet">
+      <div class="sheet-handle" id="sheetHandle"><span class="grabber"></span></div>
+      <div class="sheet-body">
+        <p class="sheet-title">오늘의 오름</p>
+        <div class="mission-card">
+          <div class="mc-head">
+            <div class="mc-icon">
+              <img class="mc-circle" src="assets/home/mission-circle.svg" alt="">
+              <img class="mc-bed" src="assets/home/bed.svg" alt="">
+            </div>
+            <div class="mc-text">
+              <p class="mc-title">이불 정리하기</p>
+              <p class="mc-sub">약 1분 · 현재 3명 진행중</p>
+            </div>
+          </div>
+          <div class="dots" id="dots">
+            <img class="dot" style="left:0" src="assets/home/check1.svg" alt="">
+            <img class="dot w33" style="left:44px" src="assets/home/check2.svg" alt="">
+            <div class="dot w33 today" id="todayDot" style="left:89px">
+              <img class="today-bg" src="assets/home/today-dot.png" alt="" width="33" height="32">
+              <span class="today-sym"><img src="assets/home/symbol-round.svg" alt=""></span>
+              <img class="today-check" src="assets/home/check2.svg" alt="">
+            </div>
+            <img class="dot" style="left:134px" src="assets/home/dot-empty32.svg" alt="">
+            <img class="dot w33" style="left:178px" src="assets/home/dot-empty33.svg" alt="">
+            <img class="dot w33" style="left:223px" src="assets/home/dot-empty33.svg" alt="">
+            <img class="dot" style="left:268px" src="assets/home/dot-empty32.svg" alt="">
+          </div>
+          <button class="btn-primary mc-btn" id="startBtn">활동 시작하기</button>
+        </div>
+
+        <!-- 펼친 상태에서만 보이는 영역 -->
+        <div class="sheet-more">
+          <div class="info-card" data-toast="챕터 화면은 이 프로토타입에 포함되지 않았어요">
+            <p class="ic-label">현재 챕터 · 1</p>
+            <p class="ic-value">숨 고르기</p>
+            <img class="ic-arrow" src="assets/sheet/arrow.svg" alt="">
+          </div>
+          <div class="info-card right" data-toast="보상 화면은 이 프로토타입에 포함되지 않았어요">
+            <p class="ic-label">누적 리워드</p>
+            <p class="ic-value"><span id="totalPoint">23,000</span> P</p>
+            <img class="ic-arrow" src="assets/sheet/arrow.svg" alt="">
+          </div>
+          <div class="past-bar" data-go="activity">
+            <span>다시 하고 싶은 활동이 있나요?</span>
+            <span class="past-link">지난 활동 보기 ›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="tabs" data-active="home"></nav>
+  </section>
+
+  <!-- ───────── 2. 미션 인증 카메라 (미션인증 1242:5837) ───────── -->
+  <section class="screen dark" id="camera" data-sb="light">
+    <div class="cam-header">
+      <p class="cam-title">미션 인증</p>
+      <button class="icon-btn cam-close" id="camClose" aria-label="닫기"><img src="assets/camera/x.svg" alt=""></button>
+    </div>
+
+    <div class="cam-mission">
+      <div class="cm-mascot"><img src="assets/camera/mascot.png" alt=""></div>
+      <p class="cm-title">이불 정리하기</p>
+      <p class="cm-sub">이불을 갠 모습이 화면에 보이게 찍어주세요</p>
+    </div>
+
+    <div class="viewfinder" id="viewfinder">
+      <video id="camVideo" autoplay playsinline muted></video>
+      <img id="camFallback" class="cam-fallback" src="assets/camera/sample.jpg" alt="예시 사진">
+      <img id="camShot" class="cam-shot" alt="촬영한 사진">
+      <div class="flash" id="camFlash"></div>
+      <img class="corner tl" src="assets/camera/corner-l.svg" alt="">
+      <img class="corner tr" src="assets/camera/corner-l.svg" alt="">
+      <img class="corner bl" src="assets/camera/corner-l.svg" alt="">
+      <img class="corner br" src="assets/camera/corner-l.svg" alt="">
+      <div class="cam-msg" id="camMsg">
+        <p id="camMsgText">카메라를 켜는 중이에요…</p>
+        <button id="camRetry" class="cam-retry">다시 시도</button>
+      </div>
+    </div>
+
+    <button class="shutter" id="shutter" aria-label="촬영"><img src="assets/camera/shutter.svg" alt=""></button>
+    <button class="flip" id="flip" aria-label="카메라 전환">
+      <img class="flip-bg" src="assets/camera/flip-bg.svg" alt="">
+      <img class="flip-ic" src="assets/camera/flip.svg" alt="">
+    </button>
+  </section>
+
+  <!-- ───────── 3. 인증 확인 중 (미션인증_로딩 1242:5946) ───────── -->
+  <section class="screen light" id="loading" data-sb="dark">
+    <div class="mid">
+      <div class="ld-mascot">
+        <img class="ld-char" src="assets/loading/mascot.png" alt="">
+        <img class="ld-eye" src="assets/loading/eye.svg" alt="">
+      </div>
+      <div class="ld-ring"><img src="assets/loading/ring.svg" alt=""></div>
+      <p class="ld-text">인증을 확인하고 있어요...</p>
+    </div>
+    <button class="btn-primary btn-bottom" id="cancelVerify">인증 취소하기</button>
+  </section>
+
+  <!-- ───────── 4. 인증 완료 (미션인증_인증완료 1242:5907) ───────── -->
+  <section class="screen light" id="done" data-sb="dark">
+    <button class="icon-btn top-close" data-home aria-label="닫기"><img src="assets/done/x.svg" alt=""></button>
+    <div class="mid">
+      <div class="dn-mascot"><img src="assets/done/mascot.png" alt=""></div>
+      <p class="dn-title">인증 완료!</p>
+      <p class="dn-sub">차근차근 나만의 속도로 오르고 있어요</p>
+      <div class="reward-box">
+        <div class="rw-row r1"><span class="rw-label">미션 지원금</span><span class="rw-val" data-count="1400" data-fmt="won">0원</span></div>
+        <img class="rw-line l1" src="assets/done/line.svg" alt="">
+        <div class="rw-row r2"><span class="rw-label">미션 리워드</span><span class="rw-val" data-count="1000" data-fmt="plus">+0P</span></div>
+        <img class="rw-line l2" src="assets/done/line.svg" alt="">
+        <div class="rw-row r3"><span class="rw-label">연속 보너스</span><span class="rw-val orange" data-count="200" data-fmt="plus">+0P</span></div>
+      </div>
+    </div>
+    <button class="btn-primary btn-upper" id="toStreak">계속 하기</button>
+    <button class="btn-ghost btn-bottom" data-home>홈으로 돌아가기</button>
+  </section>
+
+  <!-- ───────── 5. 연속활동 갱신 (미션인증_연속활동 1242:5242) ───────── -->
+  <section class="screen light" id="streak" data-sb="dark">
+    <button class="icon-btn top-close" data-home aria-label="닫기"><img src="assets/done/x.svg" alt=""></button>
+    <div class="mid">
+      <div class="st-mascot"><img src="assets/streak/mascot-crop.png" alt=""></div>
+      <p class="st-title"><span id="stTitleNum">3</span>일째, 잘하고 있어요</p>
+      <p class="st-sub">다음 단계까지 계속해요!</p>
+      <div class="st-stats">
+        <div class="st-row small"><span>현재 연속 활동</span><span>다음 단계까지</span></div>
+        <div class="st-row big"><span class="st-days"><b id="stDays">2</b>일</span><span class="st-left"><b id="stLeft">5</b>일 남음</span></div>
+        <div class="st-bar"><div class="st-bar-fill" id="stBarFill"></div></div>
+      </div>
+    </div>
+    <p class="st-hint">이어진 미션을 통해 추가보상을 받아보세요</p>
+    <button class="btn-primary btn-upper" data-toast="보너스 퀘스트는 이 프로토타입에 포함되지 않았어요">보너스 퀘스트 하기</button>
+    <button class="btn-ghost dark btn-bottom" data-home>홈으로 돌아가기</button>
+  </section>
+
+  <!-- ───────── 6. 활동 탭 · 연속 활동 캘린더 (연속활동 1242:6733) ───────── -->
+  <section class="screen light" id="activity" data-sb="dark">
+    <p class="act-title">연속 활동</p>
+    <div class="act-scroll">
+      <div class="act-hero">
+        <img class="ah-img" src="assets/activity/hedgehog.png" alt="">
+        <span class="ah-chip">연속 오름</span>
+        <p class="ah-num"><span id="actDays">2</span>일</p>
+        <p class="ah-sub">오늘도 작은 실천을 쌓았어요</p>
+      </div>
+      <div class="cal-head">
+        <p id="calMonth">2026년 11월</p>
+        <div class="cal-nav">
+          <button class="icon-btn" id="calPrev" aria-label="이전 달"><img src="assets/activity/chev-l.svg" alt=""></button>
+          <button class="icon-btn flipx" id="calNext" aria-label="다음 달"><img src="assets/activity/chev-r.svg" alt=""></button>
+        </div>
+      </div>
+      <div class="cal" id="cal"></div>
+      <div class="cal-legend">
+        <span class="lg-pill"></span><span class="lg-txt">활동 완료</span>
+        <img class="lg-dot" src="assets/activity/legend-today.svg" alt=""><span class="lg-txt">오늘</span>
+      </div>
+      <p class="act-day" id="actDayLabel">11월 15일 · 오늘</p>
+      <button class="act-card" id="actCard">
+        <span class="ac-ch">챕터 1</span>
+        <span class="ac-title">이불 정리하기</span>
+        <span class="ac-sub" id="actCardSub">아직 인증 전이에요</span>
+        <img class="ac-photo" src="assets/activity/photo.svg" alt="">
+        <img class="ac-chev" src="assets/activity/chev-sm.svg" alt="">
+      </button>
+    </div>
+    <nav class="tabs" data-active="activity"></nav>
+  </section>
+
+  <!-- 촬영 사진 보기 -->
+  <div class="photo-view" id="photoView"><img id="photoViewImg" alt="인증 사진"><p>탭하면 닫혀요</p></div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<!-- 사파리에서 처음 열었을 때: 홈 화면에 추가 안내 -->
+<div class="a2hs" id="a2hs" hidden>
+  <div class="a2hs-card">
+    <p class="a2hs-title">홈 화면에 추가해서 앱처럼 실행하세요</p>
+    <p class="a2hs-body">하단의 <b>공유</b> 버튼 <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4M5 11v9h14v-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> → <b>홈 화면에 추가</b>를 누르면 주소창 없이 전체 화면으로 열려요.</p>
+    <button id="a2hsClose">브라우저에서 그냥 볼게요</button>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
