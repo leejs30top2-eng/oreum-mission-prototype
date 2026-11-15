@@ -1,7 +1,7 @@
 /* 오프라인 캐시: 전시장 와이파이가 불안정해도 앱이 열리도록. 파일을 바꾸면 VERSION을 올린다. */
-const VERSION = 'oreum-proto-v1';
+const VERSION = 'oreum-proto-v2';
 const FILES = [
-  './', 'index.html', 'css/app.css', 'js/app.js', 'manifest.webmanifest',
+  './', 'index.html', 'css/app.css?v=2', 'js/app.js?v=2', 'manifest.webmanifest',
   'fonts/Pretendard-Regular.woff2', 'fonts/Pretendard-Medium.woff2', 'fonts/Pretendard-SemiBold.woff2',
   'fonts/NanumSquareRoundEB.woff2', 'fonts/Syncopate-Bold.ttf',
   'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png',

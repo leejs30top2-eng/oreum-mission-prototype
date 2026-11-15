@@ -23,8 +23,23 @@
   const streakNow = () => BASE.streak + (state.done ? 1 : 0);
 
   /* ───────── 레이아웃: 402×874 Figma 좌표계를 기기에 맞춰 확대·축소 ───────── */
+  // iOS 홈 화면 앱(black-translucent)에서는 innerHeight가 상태바 높이만큼 짧게 잡혀
+  // 탭바가 위로 떠 버린다 → 화면 전체 높이(100lvh, screen.height)와 비교해 큰 값을 쓴다.
+  const vhProbe = document.createElement('div');
+  vhProbe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:100vh;height:100lvh;visibility:hidden;pointer-events:none';
+  document.body.appendChild(vhProbe);
+  const isStandalone = () => window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  function viewportHeight() {
+    let vh = window.innerHeight;
+    if (isStandalone() && window.innerWidth < window.innerHeight) {
+      // 세로 고정 앱: 화면 전체를 쓰므로 기기 화면 높이가 실제 높이
+      vh = Math.max(vh, vhProbe.offsetHeight || 0, Math.max(screen.width, screen.height));
+    }
+    return vh;
+  }
+
   function layout() {
-    const vw = window.innerWidth, vh = window.innerHeight;
+    const vw = window.innerWidth, vh = viewportHeight();
     const frame = vw >= 560;      // 데스크톱·태블릿: 폰 프레임 미리보기
     let z, H, left = 0, top = 0;
     if (frame) {
