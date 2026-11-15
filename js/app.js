@@ -23,32 +23,37 @@
   const streakNow = () => BASE.streak + (state.done ? 1 : 0);
 
   /* ───────── 레이아웃: 402×874 Figma 좌표계를 기기에 맞춰 확대·축소 ───────── */
-  // iOS 홈 화면 앱(black-translucent)에서는 innerHeight가 상태바 높이만큼 짧게 잡혀
-  // 탭바가 위로 떠 버린다 → 화면 전체 높이(100lvh, screen.height)와 비교해 큰 값을 쓴다.
-  const vhProbe = document.createElement('div');
-  vhProbe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:100vh;height:100lvh;visibility:hidden;pointer-events:none';
-  document.body.appendChild(vhProbe);
+  // 홈 화면 앱은 상태바 'default'(불투명) 방식으로 실행한다.
+  //  - iOS 26의 black-translucent 모드는 innerHeight가 상태바만큼 짧고, 그 아래 띠에는
+  //    웹 콘텐츠가 그려지지 않는 버그가 있어 탭바가 뜨거나 잘렸다.
+  //  - default 모드에서는 웹 화면이 실제 상태바 바로 아래에서 시작해 화면 끝까지 그려진다.
+  //    그래서 Figma 프레임의 상단 상태바 영역(62px)을 실제 상태바 높이만큼 잘라 낸다.
+  const safeProbe = document.createElement('div');
+  safeProbe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;padding-top:env(safe-area-inset-top);visibility:hidden;pointer-events:none';
+  document.body.appendChild(safeProbe);
   const isStandalone = () => window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-  function viewportHeight() {
-    let vh = window.innerHeight;
-    if (isStandalone() && window.innerWidth < window.innerHeight) {
-      // 세로 고정 앱: 화면 전체를 쓰므로 기기 화면 높이가 실제 높이
-      vh = Math.max(vh, vhProbe.offsetHeight || 0, Math.max(screen.width, screen.height));
-    }
-    return vh;
-  }
 
   function layout() {
-    const vw = window.innerWidth, vh = viewportHeight();
+    const vw = window.innerWidth, vh = window.innerHeight;
     const frame = vw >= 560;      // 데스크톱·태블릿: 폰 프레임 미리보기
     let z, H, left = 0, top = 0;
+    state.legacyInstall = false;
     if (frame) {
       H = 874;
       z = Math.min(1, (vh - 48) / 874, (vw - 48) / 402);
       left = (vw - 402 * z) / 2; top = (vh - 874 * z) / 2;
     } else {
-      z = vw / 402; H = vh / z;
-      if (H < 700) { z = vh / 700; H = 700; left = (vw - 402 * z) / 2; }
+      z = vw / 402;
+      let crop = 0;                                   // 잘라 낼 상단 상태바 영역(디자인 px)
+      if (isStandalone() && vw < vh) {
+        const missing = Math.max(screen.width, screen.height) - vh;   // 웹 화면 밖(상태바) 높이
+        const safeTop = safeProbe.offsetHeight;
+        if (safeTop < 1 && missing > 10 && missing < 120) crop = Math.min(62, missing / z);
+        else if (safeTop >= 1 && missing > 10) state.legacyInstall = true;  // 예전(투명 상태바) 설치본
+      }
+      H = vh / z + crop;
+      top = -crop * z;
+      if (H - crop < 640) { z = vh / (640 + crop); H = 640 + crop; top = -crop * z; left = (vw - 402 * z) / 2; }
     }
     state.z = z; state.frame = frame;
     document.body.classList.toggle('frame', frame);
@@ -538,6 +543,13 @@
     let dismissed = false;
     try { dismissed = localStorage.getItem('oreum-a2hs') === '1'; } catch (_) { /* noop */ }
     if (isIOS && !standalone && !state.frame && !dismissed) $('#a2hs').hidden = false;
+    if (standalone && state.legacyInstall) {
+      // 예전 버전(투명 상태바)으로 추가된 앱: 상태바 방식은 추가할 때 정해져서 다시 추가해야 한다
+      $('.a2hs-title').textContent = '앱을 다시 추가해 주세요';
+      $('.a2hs-body').innerHTML = '화면 배치가 바뀌었어요. 홈 화면에서 이 앱을 <b>삭제</b>한 뒤, 사파리에서 주소를 열고 <b>공유 → 홈 화면에 추가</b>를 다시 해 주세요.';
+      $('#a2hsClose').textContent = '나중에 할게요';
+      $('#a2hs').hidden = false;
+    }
   }
   $('#a2hsClose').addEventListener('click', () => {
     $('#a2hs').hidden = true;

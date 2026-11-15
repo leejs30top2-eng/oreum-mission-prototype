@@ -92,10 +92,8 @@ body.frame .statusbar { display: flex; }
 .home-bg img { position: absolute; left: -0.99%; top: -0.04%; width: 100.99%; height: 100.08%; max-width: none; }
 
 .home-nav { position: absolute; left: 0; top: 62px; width: 402px; height: 58px; }
-.logo {
-  position: absolute; left: 30px; top: 20px; width: 82px; height: 18px;
-  font: 700 14px/1.4 "Syncopate", sans-serif; letter-spacing: -0.14px; color: #000;
-}
+.logo { position: absolute; left: 30px; top: 20px; width: 92px; height: 18px; }
+.logo img { position: absolute; left: 0; top: 2.5px; width: 92px; height: 13.04px; } /* oreum 워드마크(635×90) */
 .hanger { position: absolute; left: 342px; top: 20.5px; width: 22px; height: 17px; }
 .hanger::after { content: ""; position: absolute; inset: -12px; }
 .hanger img { position: absolute; left: -0.865px; top: -0.894px; width: 23.703px; height: 18.79px; max-width: none; }
