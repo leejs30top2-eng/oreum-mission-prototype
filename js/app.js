@@ -23,11 +23,10 @@
   const streakNow = () => BASE.streak + (state.done ? 1 : 0);
 
   /* ───────── 레이아웃: 402×874 Figma 좌표계를 기기에 맞춰 확대·축소 ───────── */
-  // 홈 화면 앱은 상태바 'default'(불투명) 방식으로 실행한다.
-  //  - iOS 26의 black-translucent 모드는 innerHeight가 상태바만큼 짧고, 그 아래 띠에는
-  //    웹 콘텐츠가 그려지지 않는 버그가 있어 탭바가 뜨거나 잘렸다.
-  //  - default 모드에서는 웹 화면이 실제 상태바 바로 아래에서 시작해 화면 끝까지 그려진다.
-  //    그래서 Figma 프레임의 상단 상태바 영역(62px)을 실제 상태바 높이만큼 잘라 낸다.
+  // 홈 화면 앱은 Figma처럼 상태바 뒤까지 화면을 채우는 black-translucent 방식.
+  // iOS는 이 모드에서 문서를 상태바 높이만큼 위로 올려 계산해서(innerHeight 874→812)
+  // 아래에 같은 높이의 흰 띠가 남는다 → 문서 높이를 innerHeight + 상태바 높이로 늘린다.
+  // (CSS: html.standalone { min-height: calc(100% + env(safe-area-inset-top)) })
   const safeProbe = document.createElement('div');
   safeProbe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;padding-top:env(safe-area-inset-top);visibility:hidden;pointer-events:none';
   document.body.appendChild(safeProbe);
@@ -36,24 +35,22 @@
   function layout() {
     const vw = window.innerWidth, vh = window.innerHeight;
     const frame = vw >= 560;      // 데스크톱·태블릿: 폰 프레임 미리보기
-    let z, H, left = 0, top = 0;
+    let z, H, left = 0, top = 0, docH = vh;
     state.legacyInstall = false;
+    if (isStandalone() && vw < vh) {
+      const safeTop = safeProbe.offsetHeight;
+      const screenH = Math.max(screen.width, screen.height);
+      if (safeTop >= 1) docH = Math.min(vh + safeTop, Math.max(vh, screenH));
+      else state.legacyInstall = true;   // 불투명 상태바로 추가된 이전 설치본 → 다시 추가 안내
+    }
+    document.documentElement.style.setProperty('--doc-h', docH.toFixed(2));
     if (frame) {
       H = 874;
       z = Math.min(1, (vh - 48) / 874, (vw - 48) / 402);
       left = (vw - 402 * z) / 2; top = (vh - 874 * z) / 2;
     } else {
-      z = vw / 402;
-      let crop = 0;                                   // 잘라 낼 상단 상태바 영역(디자인 px)
-      if (isStandalone() && vw < vh) {
-        const missing = Math.max(screen.width, screen.height) - vh;   // 웹 화면 밖(상태바) 높이
-        const safeTop = safeProbe.offsetHeight;
-        if (safeTop < 1 && missing > 10 && missing < 120) crop = Math.min(62, missing / z);
-        else if (safeTop >= 1 && missing > 10) state.legacyInstall = true;  // 예전(투명 상태바) 설치본
-      }
-      H = vh / z + crop;
-      top = -crop * z;
-      if (H - crop < 640) { z = vh / (640 + crop); H = 640 + crop; top = -crop * z; left = (vw - 402 * z) / 2; }
+      z = vw / 402; H = docH / z;
+      if (H < 700) { z = docH / 700; H = 700; left = (vw - 402 * z) / 2; }
     }
     state.z = z; state.frame = frame;
     document.body.classList.toggle('frame', frame);
@@ -63,6 +60,13 @@
   }
   window.addEventListener('resize', layout);
   window.addEventListener('orientationchange', () => setTimeout(layout, 250));
+
+  // 문서가 화면보다 상태바 높이만큼 길어졌으므로 페이지 자체는 스크롤되지 않게 고정
+  window.addEventListener('scroll', () => { if (window.scrollY || window.scrollX) window.scrollTo(0, 0); }, { passive: true });
+  document.addEventListener('touchmove', (e) => {
+    const sc = e.target.closest && e.target.closest('.act-scroll');
+    if (!sc || sc.scrollHeight <= sc.clientHeight) e.preventDefault();
+  }, { passive: false });
 
   /* ───────── 공통 UI 주입: 상태바(미리보기 전용) · 탭바 ───────── */
   const sbTpl = $('#tpl-statusbar');
@@ -546,7 +550,7 @@
     if (standalone && state.legacyInstall) {
       // 예전 버전(투명 상태바)으로 추가된 앱: 상태바 방식은 추가할 때 정해져서 다시 추가해야 한다
       $('.a2hs-title').textContent = '앱을 다시 추가해 주세요';
-      $('.a2hs-body').innerHTML = '화면 배치가 바뀌었어요. 홈 화면에서 이 앱을 <b>삭제</b>한 뒤, 사파리에서 주소를 열고 <b>공유 → 홈 화면에 추가</b>를 다시 해 주세요.';
+      $('.a2hs-body').innerHTML = '화면 배치와 아이콘이 바뀌었어요. 홈 화면에서 이 앱을 <b>삭제</b>한 뒤, 사파리에서 주소를 열고 <b>공유 → 홈 화면에 추가</b>를 다시 해 주세요.';
       $('#a2hsClose').textContent = '나중에 할게요';
       $('#a2hs').hidden = false;
     }

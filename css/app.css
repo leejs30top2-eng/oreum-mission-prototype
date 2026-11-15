@@ -30,6 +30,10 @@ body {
   overscroll-behavior: none;
 }
 body.bg-dark { background: #1c1612; }
+/* iOS 홈 화면 앱(black-translucent): 문서를 상태바 높이만큼 늘려 하단 흰 띠 제거 */
+html.standalone { min-height: calc(100% + env(safe-area-inset-top)); background: #fff; overscroll-behavior: none; }
+html.standalone body { position: absolute; inset: auto; top: 0; left: 0; width: 100%; height: calc(var(--doc-h, 874) * 1px); }
+
 body.frame { background: #e9e6e3; }
 
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-align: inherit; }
