@@ -701,3 +701,7 @@ body.frame .statusbar { display: flex; }
 .pf-social b { position: absolute; left: 19px; top: 16px; font-weight: 500; font-size: 16px; line-height: 1.4; letter-spacing: -0.32px; }
 .pf-social img { position: absolute; top: 57px; width: 24px; height: 24px; margin-left: -1px; }
 .pf-out { position: absolute; left: 0; width: 403px; top: 707px; text-align: center; font-weight: 500; font-size: 12px; line-height: 1.4; letter-spacing: -0.24px; color: rgba(0, 0, 0, .5); }
+
+/* 스크롤해도 옆에 스크롤 막대가 보이지 않게 (앱처럼) */
+.act-scroll, .map, .rd-scroll, .rh-list, .my-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+.act-scroll::-webkit-scrollbar, .map::-webkit-scrollbar, .rd-scroll::-webkit-scrollbar, .rh-list::-webkit-scrollbar, .my-scroll::-webkit-scrollbar { display: none; width: 0; height: 0; background: transparent; }
