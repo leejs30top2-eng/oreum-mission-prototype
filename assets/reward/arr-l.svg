@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="9" height="15" viewBox="0 0 9 15" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="Union">
+<use xlink:href="#stroke0_0_97" fill="black" fill-opacity="0.3"/>
+<mask id="stroke1_0_97" maskUnits="userSpaceOnUse" x="-0.5" y="-0.5" width="10" height="16" fill="black">
+<rect fill="white" x="-0.5" y="-0.5" width="10" height="16"/>
+<use xlink:href="#stroke0_0_97"/>
+</mask>
+<path d="M7.29355 14.3018C7.57497 14.5713 8.025 14.5652 8.29872 14.2881C8.57244 14.011 8.5662 13.5679 8.28478 13.2983L2.23035 7.5L8.28478 1.70166C8.5662 1.43214 8.57245 0.989019 8.29872 0.711916C8.025 0.434814 7.57497 0.428666 7.29355 0.698185L0.71522 6.99826C0.577625 7.13004 0.5 7.311 0.5 7.5C0.5 7.689 0.577625 7.86996 0.715219 8.00174L7.29355 14.3018Z" stroke-linecap="round" stroke-linejoin="round" stroke="black" stroke-opacity="0.3" mask="url(#stroke1_0_97)"/>
+</g>
+<defs>
+<path id="stroke0_0_97" d="M8.29872 14.2881C8.025 14.5652 7.57497 14.5713 7.29355 14.3018L0.715219 8.00174C0.577625 7.86996 0.5 7.689 0.5 7.5C0.5 7.311 0.577625 7.13004 0.71522 6.99826L7.29355 0.698185C7.57497 0.428666 8.025 0.434814 8.29872 0.711916C8.57244 0.989019 8.5662 1.43214 8.28478 1.70166L2.23035 7.5L8.28478 13.2983C8.5662 13.5679 8.57244 14.011 8.29872 14.2881Z" fill-rule="evenodd" clip-rule="evenodd"/>
+</defs>
+</svg>

@@ -17,7 +17,8 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preload" href="fonts/Pretendard-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/app.css?v=4">
+<link rel="preload" href="fonts/Pretendard-Medium.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/app.css?v=5">
 </head>
 <body>
 <div id="app" aria-live="polite">
@@ -30,19 +31,23 @@
     </div>
   </template>
 
-  <!-- ───────── 1. 홈 (홈_메인_집 1242:3831 / 바텀시트 1857:6361) ───────── -->
+  <!-- ───────── 1. 홈 (홈_메인_집 1242:3831 / 바텀시트 1857:6361 / 온보딩 1242:4074~4215 / 보너스·부활 모달) ───────── -->
   <section class="screen light" id="home" data-sb="dark">
-    <div class="home-bg"><img src="assets/home/bg.jpg" alt=""></div>
+    <div class="home-bg" data-bg="tree"><img class="scene-bg" src="assets/home/bg.jpg" alt=""></div>
 
     <div class="home-nav">
       <button class="logo" id="logo" aria-label="oreum (길게 누르면 처음 상태로)"><img src="assets/brand/wordmark.svg" alt="oreum"></button>
-      <button class="hanger" data-toast="꾸미기는 이 프로토타입에 포함되지 않았어요" aria-label="꾸미기"><img src="assets/home/hanger.svg" alt=""></button>
+      <button class="hanger" data-go="deco" data-anim="fade" aria-label="꾸미기"><img src="assets/home/hanger.svg" alt=""></button>
     </div>
 
     <div class="greeting">준호님 오늘도<br>한 걸음 올라가볼까요?</div>
 
-    <div class="char-shadow"><img src="assets/home/shadow.svg" alt=""></div>
-    <img class="char" src="assets/home/char.png" alt="오르미">
+    <div class="char-layer">
+      <div class="char-shadow"><img src="assets/home/shadow.svg" alt=""></div>
+      <img class="char" src="assets/home/char.png" alt="오르미">
+      <div class="wear-slot"></div>
+      <button class="home-bubble" id="homeBubble" aria-label="보너스 미션 보기"><img src="assets/chapter/bubble.svg" alt=""></button>
+    </div>
 
     <button class="streak-chip" id="homeChip" data-go="activity">
       <span class="sym"><img src="assets/home/symbol.svg" alt=""></span>
@@ -86,17 +91,17 @@
 
         <!-- 펼친 상태에서만 보이는 영역 -->
         <div class="sheet-more">
-          <div class="info-card" data-toast="챕터 화면은 이 프로토타입에 포함되지 않았어요">
+          <div class="info-card" data-go="chapter" data-anim="fade">
             <p class="ic-label">현재 챕터 · 1</p>
             <p class="ic-value">숨 고르기</p>
             <img class="ic-arrow" src="assets/sheet/arrow.svg" alt="">
           </div>
-          <div class="info-card right" data-toast="보상 화면은 이 프로토타입에 포함되지 않았어요">
+          <div class="info-card right" data-go="reward" data-anim="fade">
             <p class="ic-label">누적 리워드</p>
-            <p class="ic-value"><span id="totalPoint">23,000</span> P</p>
+            <p class="ic-value"><span class="js-total">23,000</span> P</p>
             <img class="ic-arrow" src="assets/sheet/arrow.svg" alt="">
           </div>
-          <div class="past-bar" data-go="activity">
+          <div class="past-bar" data-go="activity" data-anim="fade">
             <span>다시 하고 싶은 활동이 있나요?</span>
             <span class="past-link">지난 활동 보기 ›</span>
           </div>
@@ -105,9 +110,61 @@
     </div>
 
     <nav class="tabs" data-active="home"></nav>
+
+    <!-- 첫 진입 온보딩 (홈_메인_온보딩 1/3~3/3) -->
+    <div class="onb" id="onb" hidden>
+      <svg class="onb-dim" viewBox="0 0 402 874" preserveAspectRatio="none"><path id="onbPath" fill="rgba(0,0,0,0.75)" fill-rule="evenodd"/></svg>
+      <button class="onb-skip" id="onbSkip">건너뛰기</button>
+      <button class="onb-card" id="onbCard">
+        <span class="onb-step" id="onbStep">1/3</span>
+        <span class="onb-title" id="onbTitle">여기서 오늘의 단계를 볼 수 있어요!</span>
+        <span class="onb-desc" id="onbDesc">연속으로 며칠째인지, 다음 단계까지 얼마나 남았는지 알 수 있어요</span>
+      </button>
+    </div>
+
+    <!-- 보너스 미션 (1242:3898) -->
+    <div class="modal" id="bonusModal" hidden>
+      <div class="modal-dim"></div>
+      <div class="modal-mid">
+        <div class="mpanel bonus">
+          <p class="mp-head">보너스 미션</p>
+          <button class="mp-x" data-close aria-label="닫기"><img src="assets/bonus/x.svg" alt=""></button>
+          <p class="mp-title">편의점에서 라면 먹기</p>
+          <p class="mp-desc">가까운 편의점에서<br>라면 한끼를 즐겨보세요</p>
+          <img class="mp-img ramen" src="assets/bonus/ramen.png" alt="">
+          <div class="mp-info">
+            <div class="mp-row"><span>미션 지원금</span><b>1,400원</b></div>
+            <div class="mp-row"><span>완료 보상</span><b>+200P</b></div>
+          </div>
+          <p class="mp-note">미션비는 Oreum에서 제공해요 · 오늘 3명 완료</p>
+          <button class="mp-btn" id="bonusStart">미션 시작하기</button>
+          <button class="mp-btn ghost" data-close>지금은 쉬어갈게요</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 부활 미션 (1242:3987) -->
+    <div class="modal" id="revModal" hidden>
+      <div class="modal-dim"></div>
+      <div class="modal-mid">
+        <div class="mpanel rev">
+          <p class="mp-head">부활 미션</p>
+          <button class="mp-x" data-close aria-label="닫기"><img src="assets/bonus/x.svg" alt=""></button>
+          <p class="mp-title">버스정류장 다녀오기</p>
+          <p class="mp-desc">버스정류장에 도착해<br>인증 사진을 찍어주세요</p>
+          <img class="mp-img bus" src="assets/revival/bus.png" alt="">
+          <div class="mp-info">
+            <div class="mp-row"><span>남은 시간</span><b id="revTimer">23:59:30</b></div>
+            <div class="mp-row"><span>연속 활동</span><b>10일 → 11일</b></div>
+          </div>
+          <p class="mp-note">부활 미션을 완료하면 연속 활동이 이어져요</p>
+          <button class="mp-btn" id="revStart">부활 미션하기</button>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <!-- ───────── 2. 미션 인증 카메라 (미션인증 1242:5837) ───────── -->
+  <!-- ───────── 2. 미션 인증 카메라 (미션인증 1242:5837 / 보너스 1242:5121 / 부활 1242:5147) ───────── -->
   <section class="screen dark" id="camera" data-sb="light">
     <div class="cam-header">
       <p class="cam-title">미션 인증</p>
@@ -116,8 +173,9 @@
 
     <div class="cam-mission">
       <div class="cm-mascot"><img src="assets/camera/mascot.png" alt=""></div>
-      <p class="cm-title">이불 정리하기</p>
-      <p class="cm-sub">이불을 갠 모습이 화면에 보이게 찍어주세요</p>
+      <img class="cm-icon" id="camIcon" alt="">
+      <p class="cm-title" id="camTitle">이불 정리하기</p>
+      <p class="cm-sub" id="camSub">이불을 갠 모습이 화면에 보이게 찍어주세요</p>
     </div>
 
     <div class="viewfinder" id="viewfinder">
@@ -129,17 +187,57 @@
       <img class="corner tr" src="assets/camera/corner-l.svg" alt="">
       <img class="corner bl" src="assets/camera/corner-l.svg" alt="">
       <img class="corner br" src="assets/camera/corner-l.svg" alt="">
+      <span class="cam-pill">카메라 미리보기</span>
       <div class="cam-msg" id="camMsg">
         <p id="camMsgText">카메라를 켜는 중이에요…</p>
         <button id="camRetry" class="cam-retry">다시 시도</button>
       </div>
     </div>
+    <p class="cam-hint">앱 카메라로 찍은 사진만 인증돼요 · 사진은 인증 후 삭제</p>
 
     <button class="shutter" id="shutter" aria-label="촬영"><img src="assets/camera/shutter.svg" alt=""></button>
     <button class="flip" id="flip" aria-label="카메라 전환">
       <img class="flip-bg" src="assets/camera/flip-bg.svg" alt="">
       <img class="flip-ic" src="assets/camera/flip.svg" alt="">
     </button>
+  </section>
+
+  <!-- ───────── 2-1. 산책 미션 (미션인증 1242:5863) ───────── -->
+  <section class="screen dark" id="walk" data-sb="light">
+    <div class="cam-header">
+      <p class="cam-title">미션 인증</p>
+      <button class="icon-btn cam-close" data-back aria-label="닫기"><img src="assets/camera/x.svg" alt=""></button>
+    </div>
+    <div class="cam-mission">
+      <div class="wk-mascot"><img src="assets/walk/mascot.png" alt=""></div>
+      <p class="cm-title">집 근처 10분 산책하기</p>
+      <p class="cm-sub">움직이면 시간이 흘러요</p>
+    </div>
+    <span class="wk-timer" id="wkTimer">01:13</span>
+    <div class="wk-map">
+      <div class="wk-park"></div>
+      <img class="wk-lake" src="assets/walk/lake.svg" alt="">
+      <div class="wk-road r1"><i></i></div>
+      <div class="wk-road r2"><i></i></div>
+      <div class="wk-road r3"></div>
+      <div class="wk-road r4"><i></i></div>
+      <img class="wk-zone" src="assets/walk/zone.png" alt="">
+      <img class="wk-dot" style="left:75px;top:334.17px" src="assets/walk/dot.svg" alt="">
+      <img class="wk-dot" style="left:90.62px;top:301.73px" src="assets/walk/dot.svg" alt="">
+      <img class="wk-dot" style="left:106.25px;top:269.3px" src="assets/walk/dot.svg" alt="">
+      <img class="wk-dot" style="left:121.87px;top:236.87px" src="assets/walk/dot.svg" alt="">
+      <img class="wk-dot" style="left:137.49px;top:204.43px" src="assets/walk/dot.svg" alt="">
+      <img class="wk-dot" style="left:153.12px;top:172px" src="assets/walk/dot.svg" alt="">
+      <img class="wk-start" src="assets/walk/start.svg" alt="">
+      <img class="wk-startdot" src="assets/walk/startdot.svg" alt="">
+      <span class="wk-label">시작 지점</span>
+      <div class="wk-me" id="wkMe">
+        <img class="wk-ring" src="assets/walk/mering.svg" alt="">
+        <div class="wk-face"><img src="assets/walk/me.png" alt=""></div>
+      </div>
+    </div>
+    <p class="wk-note">위치 정보는 인증에만 쓰이고 저장되지 않아요</p>
+    <button class="wk-bar" id="wkDone">시간을 전부 채우면 인증이 완료돼요.</button>
   </section>
 
   <!-- ───────── 3. 인증 확인 중 (미션인증_로딩 1242:5946) ───────── -->
@@ -155,7 +253,7 @@
     <button class="btn-primary btn-bottom" id="cancelVerify">인증 취소하기</button>
   </section>
 
-  <!-- ───────── 4. 인증 완료 (미션인증_인증완료 1242:5907) ───────── -->
+  <!-- ───────── 4. 인증 완료 (1242:5907 / 보너스 1242:5173 / 부활 1242:5268) ───────── -->
   <section class="screen light" id="done" data-sb="dark">
     <button class="icon-btn top-close" data-home aria-label="닫기"><img src="assets/done/x.svg" alt=""></button>
     <div class="mid">
@@ -170,7 +268,19 @@
         <div class="rw-row r3"><span class="rw-label">연속 보너스</span><span class="rw-val orange" data-count="200" data-fmt="plus">+0P</span></div>
       </div>
     </div>
-    <button class="btn-primary btn-upper" id="toStreak">계속 하기</button>
+    <button class="btn-primary btn-upper" id="doneNext">계속 하기</button>
+    <button class="btn-ghost dark btn-bottom done-home" data-home>홈으로 돌아가기</button>
+  </section>
+
+  <!-- ───────── 4-1. 인증 실패 (미션인증_인증실패 1242:5934) ───────── -->
+  <section class="screen light" id="fail" data-sb="dark">
+    <button class="icon-btn top-close" data-home aria-label="닫기"><img src="assets/done/x.svg" alt=""></button>
+    <div class="mid">
+      <div class="fl-mascot"><img src="assets/fail/mascot.png" alt=""></div>
+      <p class="fl-title">앗, 인증에 실패했어요</p>
+      <p class="fl-sub">미션 대상이 잘 보이도록 사진을 다시 찍어볼까요?</p>
+    </div>
+    <button class="btn-primary btn-upper" id="failRetry">다시 인증하기</button>
     <button class="btn-ghost btn-bottom" data-home>홈으로 돌아가기</button>
   </section>
 
@@ -188,7 +298,30 @@
       </div>
     </div>
     <p class="st-hint">이어진 미션을 통해 추가보상을 받아보세요</p>
-    <button class="btn-primary btn-upper" data-toast="보너스 퀘스트는 이 프로토타입에 포함되지 않았어요">보너스 퀘스트 하기</button>
+    <button class="btn-primary btn-upper" id="toBonus">보너스 퀘스트 하기</button>
+    <button class="btn-ghost dark btn-bottom" data-home>홈으로 돌아가기</button>
+  </section>
+
+  <!-- ───────── 5-1. 부활 온보딩 (1242:5202) ───────── -->
+  <section class="screen light" id="revonb" data-sb="dark">
+    <button class="icon-btn top-close" data-home aria-label="닫기"><img src="assets/done/x.svg" alt=""></button>
+    <div class="mid">
+      <img class="ro-mascot" src="assets/revival/mascot.png" alt="">
+      <p class="ro-title">준호님, 기다리고 있었어요!</p>
+      <p class="ro-sub">부활 미션을 완료하면<br>기록을 이어갈 수 있어요</p>
+      <div class="ro-week">
+        <img class="ro-c" style="left:105px" src="assets/revival/e243.png" alt="">
+        <img class="ro-c" style="left:151px" src="assets/revival/e244.png" alt="">
+        <img class="ro-c" style="left:197px" src="assets/revival/empty.svg" alt="">
+        <img class="ro-c" style="left:243px" src="assets/revival/empty.svg" alt="">
+        <img class="ro-c" style="left:288.5px" src="assets/revival/empty.svg" alt="">
+        <img class="ro-g196" src="assets/revival/g196.svg" alt="">
+        <img class="ro-g195" src="assets/revival/g195.svg" alt="">
+        <img class="ro-x" src="assets/revival/xgray.svg" alt="">
+        <span class="ro-d" style="left:27px">월</span><span class="ro-d" style="left:73px">화</span><span class="ro-d gray" style="left:119px">수</span><span class="ro-d orange" style="left:165px">목</span><span class="ro-d gray" style="left:211px">금</span><span class="ro-d gray" style="left:257px">토</span><span class="ro-d gray" style="left:303px">일</span>
+      </div>
+    </div>
+    <button class="btn-primary btn-upper" id="revOpen">부활 미션하기</button>
     <button class="btn-ghost dark btn-bottom" data-home>홈으로 돌아가기</button>
   </section>
 
@@ -226,6 +359,255 @@
     <nav class="tabs" data-active="activity"></nav>
   </section>
 
+  <!-- ───────── 7. 챕터 지도 (챕터 1242:6311 / 1348:1030, 배경 팝업 1242:5438) ───────── -->
+  <section class="screen light" id="chapter" data-sb="dark">
+    <div class="map" id="map">
+      <div class="map-inner">
+        <img class="m-bg-top" src="assets/chapter/bg-top.png" alt="">
+        <div class="m-bg"><img src="assets/chapter/bg.jpg" alt=""></div>
+        <img class="m-abs" style="left:22.99px;top:30.49px;width:335.31px;height:1227.58px" src="assets/chapter/union.svg" alt="">
+        <div class="m-path-a"><div><img src="assets/chapter/path-a.svg" alt=""></div></div>
+        <div class="m-path-b"><img src="assets/chapter/path-b.svg" alt=""></div>
+        <div class="m-node" style="left:49px;top:172.06px"><img src="assets/chapter/node-gray.svg" alt=""></div>
+        <div class="m-node" style="left:90px;top:340.06px"><img src="assets/chapter/node-gray.svg" alt=""></div>
+        <div class="m-node" style="left:220px;top:488.06px"><img src="assets/chapter/node-gray.svg" alt=""></div>
+        <div class="m-node w70" id="nodeDone" style="left:240px;top:1160.06px"><img src="assets/chapter/node-done.svg" alt=""></div>
+        <div class="m-node w70" id="nodeToday" style="left:107px;top:1036.06px"><img src="assets/chapter/node-today.svg" alt=""></div>
+        <div class="m-tag"><span>오늘의 오름</span><i><img src="assets/chapter/tip.svg" alt=""></i></div>
+        <div class="m-yaho" id="mapYaho"><img src="assets/chapter/yaho.svg" alt=""></div>
+        <div class="m-node" style="left:220px;top:709px"><img src="assets/chapter/node-gray.svg" alt=""></div>
+        <button class="m-node m-next" id="nodeNext" style="left:100px;top:835.06px" aria-label="다음 미션 미리 해보기"><img src="assets/chapter/node-gray.svg" alt=""></button>
+        <div class="m-fade"></div>
+        <span class="m-lock">챕터 1을 먼저 클리어하세요!</span>
+        <img class="m-abs" style="left:371px;top:560px;width:37px;height:27px" src="assets/chapter/grass.png" alt="">
+        <img class="m-abs" style="left:69px;top:1207px;width:37px;height:27px" src="assets/chapter/grass.png" alt="">
+        <img class="m-abs fx" style="left:-10px;top:333px;width:39px;height:29px" src="assets/chapter/grass.png" alt="">
+        <img class="m-abs fx" style="left:305.5px;top:219px;width:39px;height:29px" src="assets/chapter/grass.png" alt="">
+        <img class="m-abs fx" style="left:146px;top:592px;width:37px;height:27px" src="assets/chapter/grass.png" alt="">
+        <img class="m-abs" style="left:296px;top:241px;width:19px;height:18px" src="assets/chapter/grass-s.png" alt="">
+        <img class="m-abs fx" style="left:54px;top:1200px;width:15px;height:14px" src="assets/chapter/grass-s.png" alt="">
+        <div class="m-shadow"><img src="assets/chapter/shadow.svg" alt=""></div>
+        <button class="m-carousel" id="carousel" aria-label="놀이공원">
+          <img class="m-bubble" src="assets/chapter/bubble.svg" alt="">
+          <img class="m-car" src="assets/chapter/carousel.png" alt="">
+        </button>
+        <img class="m-abs fx" style="left:34px;top:592px;width:37px;height:27px" src="assets/chapter/grass.png" alt="">
+        <img class="m-abs" style="left:265px;top:842px;width:134px;height:227px" src="assets/chapter/tree-a.png" alt="">
+        <img class="m-abs fx" style="left:324px;top:863px;width:134px;height:227px" src="assets/chapter/tree-b.png" alt="">
+        <img class="m-abs" style="left:-44px;top:649px;width:125px;height:212px" src="assets/chapter/tree-b.png" alt="">
+        <img class="m-abs" style="left:341px;top:1061px;width:71px;height:55px" src="assets/chapter/rock.png" alt="">
+        <img class="m-abs" style="left:-34px;top:824px;width:71px;height:55px" src="assets/chapter/rock.png" alt="">
+        <div class="m-treec"><img src="assets/chapter/tree-c.png" alt=""></div>
+        <img class="m-abs" style="left:379px;top:367px;width:37px;height:27px" src="assets/chapter/grass.png" alt="">
+        <img class="m-abs" style="left:331px;top:345px;width:97px;height:75px" src="assets/chapter/rock.png" alt="">
+        <img class="m-abs" style="left:297px;top:1037px;width:37px;height:27px" src="assets/chapter/grass.png" alt="">
+        <img class="m-abs fx" style="left:334px;top:1050px;width:15px;height:14px" src="assets/chapter/grass-s.png" alt="">
+        <img class="m-abs fx" style="left:28px;top:845px;width:15px;height:14px" src="assets/chapter/grass-s.png" alt="">
+      </div>
+    </div>
+    <div class="ch-head"></div>
+    <img class="ch-logo" src="assets/brand/wordmark.svg" alt="oreum">
+    <div class="ch-card">
+      <div class="ch-mascot"><img src="assets/chapter/ch-mascot.png" alt=""></div>
+      <span class="ch-chip">챕터 1</span>
+      <p class="ch-title">숨 고르기</p>
+      <p class="ch-sub">집 안에서 생활리듬 되찾기</p>
+      <p class="ch-count" id="chCount">1/7</p>
+      <div class="ch-bar"><i id="chBar"></i></div>
+    </div>
+    <div class="ch-today">
+      <img class="ct-icon" src="assets/chapter/bed-icon.svg" alt="">
+      <p class="ct-label">오늘의 오름</p>
+      <p class="ct-title">양치하기</p>
+      <button class="ct-btn" id="chMission">미션하기</button>
+    </div>
+    <nav class="tabs" data-active="chapter"></nav>
+
+    <!-- 배경 획득 팝업 (배경 팝업_놀이공원 1242:5438) -->
+    <div class="modal" id="bgPop" hidden>
+      <div class="modal-dim"></div>
+      <div class="modal-mid">
+        <div class="mpanel bgp">
+          <p class="mp-head">배경 획득</p>
+          <button class="mp-x" data-close aria-label="닫기"><img src="assets/bonus/x.svg" alt=""></button>
+          <p class="mp-title">놀이공원 배경을 얻었어요!</p>
+          <p class="mp-desc one">홈 화면에 적용해 즐거운 하루를 보내봐요</p>
+          <div class="bgp-thumb"><img src="assets/park/bg.jpg" alt=""></div>
+          <button class="mp-btn" id="bgApply">적용하기</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── 7-1. 배경 해금 (배경 해금(놀이공원) 1242:5819) ───────── -->
+  <section class="screen light" id="unlock" data-sb="dark">
+    <button class="icon-btn top-close" data-back aria-label="닫기"><img src="assets/done/x.svg" alt=""></button>
+    <div class="mid">
+      <img class="ul-img" src="assets/unlock/gate.png" alt="">
+      <p class="ul-title">놀이공원에 도착했어요!</p>
+      <p class="ul-sub">놀이기구를 타며 즐거운 하루를 보내볼까요?</p>
+    </div>
+    <button class="btn-primary ul-btn" id="unlockGet">배경 얻기</button>
+  </section>
+
+  <!-- ───────── 8. 꾸미기 (홈_꾸미기 1242:6572 / 6620 / 6677) ───────── -->
+  <section class="screen light" id="deco" data-sb="dark">
+    <div class="home-bg" data-bg="tree"><img class="scene-bg" src="assets/home/bg.jpg" alt=""></div>
+    <div class="home-nav">
+      <img class="deco-logo" src="assets/brand/wordmark.svg" alt="oreum">
+      <button class="hanger" id="decoHanger" aria-label="꾸미기"><img src="assets/home/hanger.svg" alt=""></button>
+    </div>
+    <div class="greeting">오르미를 자유롭게<br>꾸며보세요!</div>
+    <div class="char-layer">
+      <div class="char-shadow"><img src="assets/home/shadow.svg" alt=""></div>
+      <img class="char" src="assets/home/char.png" alt="오르미">
+      <div class="wear-slot"></div>
+    </div>
+    <div class="dsheet" id="dsheet">
+      <div class="dsheet-handle" id="dsheetHandle"><span class="grabber"></span></div>
+      <p class="ds-title">꾸미기</p>
+      <button class="icon-btn ds-x" id="decoClose" aria-label="닫기"><img src="assets/deco/x.svg" alt=""></button>
+      <div class="ds-tabs">
+        <button class="ds-tab on" data-dtab="bg">배경</button>
+        <button class="ds-tab" data-dtab="wear">악세사리</button>
+        <button class="ds-tab" data-dtab="prop">소품</button>
+      </div>
+      <div class="ds-grid" id="dsGrid"></div>
+      <button class="btn-primary ds-save" id="decoSave">저장하기</button>
+    </div>
+  </section>
+
+  <!-- ───────── 9. 보상 (리워드_환급모드 O 1242:5957) ───────── -->
+  <section class="screen light" id="reward" data-sb="dark">
+    <p class="pg-title">보상</p>
+    <div class="rd-scroll">
+      <p class="rd-label">누적 리워드</p>
+      <p class="rd-total"><span class="js-total">23,000</span><em>P</em></p>
+      <button class="rd-hist" data-go="rhist">내역 보기<img src="assets/reward/chev-w.svg" alt=""></button>
+      <div class="rd-coin"><img src="assets/reward/m-coin.png" alt=""></div>
+
+      <p class="rd-h" style="top:305px">연속 오름 보너스</p>
+      <span class="rd-step">2단계</span>
+      <p class="rd-p" style="top:327px">연속 오름일을 늘려 단계를 올리고 리워드를 더 받아요</p>
+      <div class="rd-bar"><i></i></div>
+      <p class="rd-p small" style="top:377px">다음 단계까지 <b>3일</b></p>
+      <i class="rd-line" style="top:424px"></i>
+
+      <p class="rd-h" style="top:455px">위젯 설치 보너스</p>
+      <button class="rd-toggle" id="widgetToggle" aria-label="위젯 설치 보너스" aria-pressed="false"><i></i></button>
+      <p class="rd-p" style="top:487px">리워드 <b>15%</b> 추가<br>위젯을 설치하고 추가 혜택을 받아요</p>
+      <div class="rd-widget"><img src="assets/reward/m-widget.png" alt=""></div>
+      <i class="rd-line" style="top:593px"></i>
+
+      <button class="rd-refund" data-go="refund">
+        <span class="rd-h" style="top:0">환급 모드</span>
+        <span class="rd-amount"><span id="refundAmt">30,000</span>원</span>
+        <span class="rd-p" style="top:74px">모든 커리큘럼을 끝내고 더 많은 금액을 돌려받아요</span>
+        <span class="rd-mref"><img src="assets/reward/m-refund.png" alt=""></span>
+      </button>
+    </div>
+    <nav class="tabs" data-active="reward"></nav>
+  </section>
+
+  <!-- ───────── 9-1. 보상 내역 (챕터별 1242:6033 / 날짜별 1242:6090) ───────── -->
+  <section class="screen light" id="rhist" data-sb="dark">
+    <button class="icon-btn pg-back" data-back aria-label="뒤로"><img src="assets/reward/back.svg" alt=""></button>
+    <p class="pg-title">보상 내역</p>
+    <p class="rd-label">누적 리워드</p>
+    <p class="rd-total"><span class="js-total">23,000</span><em>P</em></p>
+    <div class="rh-tabs">
+      <button class="rh-tab on" data-htab="chapter">챕터별</button>
+      <button class="rh-tab" data-htab="date">날짜별</button>
+    </div>
+    <div class="rh-nav">
+      <button id="rhPrev" aria-label="이전"><img src="assets/reward/arr-l.svg" alt=""></button>
+      <p id="rhLabel">챕터 1</p>
+      <button id="rhNext" class="flipx" aria-label="다음"><img src="assets/reward/arr-r.svg" alt=""></button>
+    </div>
+    <div class="rh-list" id="rhList"></div>
+    <nav class="tabs" data-active="reward"></nav>
+  </section>
+
+  <!-- ───────── 9-2. 환급 모드 (환급모드 1242:5050) ───────── -->
+  <section class="screen light" id="refund" data-sb="dark">
+    <button class="icon-btn pg-back" data-back aria-label="뒤로"><img src="assets/reward/back.svg" alt=""></button>
+    <p class="pg-title">환급 모드</p>
+    <div class="mid rf-mid">
+      <div class="rf-hero">
+        <p class="rf-h">끝까지 해내면<br>걸어둔 금액이 2배가 돼요</p>
+        <p class="rf-s">미션을 모두 마치면 예치한 금액의 2배를 받아요</p>
+      </div>
+      <p class="rf-label">걸어둘 금액</p>
+      <p class="rf-max">최대 50,000원</p>
+      <div class="rf-input"><span id="rfValue">30,000</span><em>원</em></div>
+      <button class="rf-chip" style="left:29px;width:77.324px" data-add="1000">+1,000원</button>
+      <button class="rf-chip" style="left:116.24px;width:77.324px" data-add="5000">+5,000원</button>
+      <button class="rf-chip" style="left:203.47px;width:89.22px" data-add="10000">+10,000원</button>
+      <button class="rf-chip max" style="left:302.61px;width:69.393px" data-add="max">최대</button>
+      <div class="rf-sum">
+        <p class="rf-row" style="top:16.92px"><span>걸어둔 금액</span><b id="rfBet">30,000원</b></p>
+        <img class="rf-line" style="top:52px;left:23px" src="assets/my/line.svg" alt="">
+        <p class="rf-row" style="top:67.36px"><span>완주하면</span><b class="orange" id="rfWin">60,000원 (2배)</b></p>
+        <img class="rf-line" style="top:101.5px;left:24px" src="assets/my/line.svg" alt="">
+        <p class="rf-row" style="top:116.89px"><span>도중에 그만두면</span><b>받을 수 없어요</b></p>
+      </div>
+      <p class="rf-note">도중에 그만두면 예치한 금액은 돌려받을 수 없어요.<br>환급모드는 회원가입 때만 선택할 수 있어요.</p>
+    </div>
+    <button class="btn-primary rf-yes" id="refundYes">해볼게요</button>
+    <button class="btn-ghost dark rf-no" data-back>안할래요</button>
+  </section>
+
+  <!-- ───────── 10. 마이 페이지 (1242:6209) ───────── -->
+  <section class="screen light" id="my" data-sb="dark">
+    <p class="pg-title">마이 페이지</p>
+    <div class="my-scroll">
+      <button class="my-profile" data-go="profile">
+        <span class="mp-avatar"><img src="assets/my/avatar.png" alt=""></span>
+        <span class="mp-cap">프로필</span>
+        <span class="mp-name">준호 <em>님</em></span>
+        <img class="mp-chev" src="assets/my/chev.svg" alt="">
+      </button>
+      <p class="my-sec" style="top:149px">설정</p>
+      <div class="my-box" style="top:181px;height:246px">
+        <button class="my-row" style="top:0" data-toast="주소 설정은 준비 중이에요"><img class="my-ic" style="left:23.97px;top:28.97px;width:34.07px;height:28.73px" src="assets/my/address.svg" alt=""><b>주소 설정</b><small>활동에 사용할 주소를 관리하세요</small></button>
+        <i class="my-line" style="top:83px"></i>
+        <button class="my-row" style="top:79px" data-toast="계좌 설정은 준비 중이에요"><img class="my-ic" style="left:24px;top:33px;width:35px;height:21.43px" src="assets/my/account.svg" alt=""><b>계좌 설정</b><small>리워드를 받을 계좌를 등록해요</small></button>
+        <i class="my-line" style="top:162px"></i>
+        <button class="my-row" style="top:158px" data-toast="알림 설정은 준비 중이에요"><img class="my-ic" style="left:26px;top:28px;width:30px;height:30px" src="assets/my/bell.svg" alt=""><b>알림 설정</b><small>미션과 리워드 알림을 관리해요</small></button>
+      </div>
+      <p class="my-sec" style="top:457px">서비스</p>
+      <div class="my-box" style="top:489px;height:219px">
+        <button class="my-row one" style="top:0" data-toast="공지사항은 준비 중이에요"><img class="my-ic" style="left:25px;top:26px;width:30px;height:20px" src="assets/my/notice.svg" alt=""><b>공지사항</b></button>
+        <i class="my-line" style="top:68px;left:22px"></i>
+        <button class="my-row one" style="top:70px" data-toast="문의하기는 준비 중이에요">
+          <span class="my-hp"><i style="left:3.75px;top:18.33px;width:5.18px;height:7.43px"></i><i style="left:21.25px;top:18.86px;width:5.18px;height:7.26px"></i><img src="assets/my/headphones.svg" alt=""><img class="hp-mic" src="assets/my/hp-mic.svg" alt=""><i style="left:10.89px;top:29.78px;width:7.14px;height:5.22px;border-radius:1px"></i></span><b>문의하기</b></button>
+        <i class="my-line" style="top:143px;left:22px"></i>
+        <button class="my-row one" style="top:144px" data-toast="약관은 준비 중이에요"><img class="my-ic" style="left:25px;top:20px;width:30px;height:30px" src="assets/my/shield.svg" alt=""><b>약관 및 개인정보 처리방침</b></button>
+      </div>
+    </div>
+    <nav class="tabs" data-active="my"></nav>
+  </section>
+
+  <!-- ───────── 10-1. 프로필 (1242:6147) ───────── -->
+  <section class="screen light" id="profile" data-sb="dark">
+    <button class="icon-btn pg-back pf-back" data-back aria-label="뒤로"><img src="assets/my/back30.svg" alt=""></button>
+    <p class="pg-title">프로필</p>
+    <div class="pf-avatar"><img src="assets/my/avatar.png" alt=""></div>
+    <div class="pf-field" style="top:294px"><b>닉네임</b><span>닉네임 입력하기</span></div>
+    <div class="pf-field" style="top:367px"><b>아이디</b><span>abcdefg</span></div>
+    <div class="pf-field" style="top:440px"><b>이메일</b><span>12345@naver.com</span></div>
+    <div class="pf-field" style="top:513px"><b>비밀번호</b><span>********</span></div>
+    <div class="pf-social">
+      <b>로그인 연결하기</b>
+      <img style="left:48px" src="assets/my/apple.svg" alt="Apple">
+      <img style="left:122.5px" src="assets/my/kakao.svg" alt="카카오">
+      <img style="left:196px" src="assets/my/google.svg" alt="Google">
+      <img style="left:270px" src="assets/my/naver.svg" alt="네이버">
+    </div>
+    <button class="pf-out" data-toast="프로토타입에서는 로그아웃할 수 없어요">로그아웃 · 회원 탈퇴</button>
+    <nav class="tabs" data-active="my"></nav>
+  </section>
+
   <!-- 촬영 사진 보기 -->
   <div class="photo-view" id="photoView"><img id="photoViewImg" alt="인증 사진"><p>탭하면 닫혀요</p></div>
 
@@ -241,6 +623,6 @@
   </div>
 </div>
 
-<script src="js/app.js?v=4"></script>
+<script src="js/app.js?v=5"></script>
 </body>
 </html>
