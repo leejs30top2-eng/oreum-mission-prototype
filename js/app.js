@@ -345,7 +345,6 @@
     renderHome(); setSheet(SHEET_MAX);
     $('#carousel').classList.remove('got');
     toast('처음 상태로 돌렸어요');
-    setTimeout(openOnb, 500);
   }
 
   /* ───────── 첫 진입 온보딩 ───────── */
@@ -888,7 +887,6 @@
   $('#a2hsClose').addEventListener('click', () => {
     $('#a2hs').hidden = true;
     try { localStorage.setItem('oreum-a2hs', '1'); } catch (_) { /* noop */ }
-    setTimeout(openOnb, 200);
   });
 
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
@@ -898,15 +896,16 @@
   ['assets/loading/mascot.png', 'assets/done/mascot.png', 'assets/streak/mascot-crop.png', 'assets/camera/mascot.png', 'assets/chapter/bg.jpg', 'assets/chapter/carousel.png', 'assets/unlock/gate.png', 'assets/deco/bg-park.jpg', 'assets/bonus/sample.jpg', 'assets/revival/sample.jpg', 'assets/fail/mascot.png']
     .forEach((s) => { const i = new Image(); i.src = s; });
 
-  /* ───────── 시작: 홈 + 첫 진입 온보딩 ───────── */
+  /* ───────── 시작: 홈 ───────── */
   layout();
   $('#home').classList.add('active');
   renderHome();
   setSheet(SHEET_MAX, false);
   syncBodyBg();
   const params = new URLSearchParams(location.search);
-  const blocked = maybeShowA2HS();
-  if (!blocked && !params.has('noonb') && !params.get('screen')) setTimeout(openOnb, 450);
+  maybeShowA2HS();
+  // 온보딩(홈_메인_온보딩)은 사용자 요청으로 자동 표시하지 않음. 확인용: ?onb
+  if (params.has('onb')) setTimeout(openOnb, 450);
 
   // 개발 확인용: ?screen=chapter 처럼 특정 화면으로 바로 이동 (?mission=bonus 등과 함께)
   const q = params.get('screen');
